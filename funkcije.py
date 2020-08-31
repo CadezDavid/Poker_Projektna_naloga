@@ -6,17 +6,6 @@ import collections
 #zapis karte: (stevilo, znak)
 znaki = ['KARA', 'KRIZ', 'SRCE', 'PIK']
 stevila = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
-#'2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, '10': 10, 'J': 11, 'Q': 12, 'K': 13, 'A': 14
-# 'visja_karta': 1,
-# 'par': 2,
-# 'dva_para': 3,
-# 'tris': 4,
-# 'lestvica': 5,
-# 'barva': 6,
-# 'full_house': 7,
-# 'poker': 8,
-# 'barvna_lestvica': 9,
-# 'kraljeva_lestvica': 10
 
 
 def nov_kup():
@@ -159,3 +148,9 @@ def primerjaj_sedmerici(karte1, karte2):
         return 2
     else:
         return 0
+
+def equal_sez(seznam):
+    return seznam[1:] == seznam[:-1]
+
+def seznam_začenši_z_n_tim(seznam, n):
+    return seznam[n:] + seznam[:n]
