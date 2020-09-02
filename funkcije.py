@@ -7,6 +7,31 @@ import collections
 znaki = ['KARA', 'KRIZ', 'SRCE', 'PIK']
 stevila = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
 
+oznake_slike = {
+    1: '1',
+    2: '2',
+    3: '3',
+    4: '4',
+    5: '5',
+    6: '6',
+    7: '7',
+    8: '8',
+    9: '9',
+    10: '10',
+    11: 'J',
+    12: 'Q',
+    13: 'K',
+    14: 'A',
+    'KARA': 'D',
+    'KRIZ': 'C',
+    'SRCE': 'H',
+    'PIK': 'S'
+}
+
+def alternativni_zapis(karta):
+    if karta == 'Neodprta':
+        return karta
+    return str(oznake_slike[karta[0]]) + str(oznake_slike[karta[1]])
 
 def nov_kup():
     kup = list()
@@ -77,11 +102,11 @@ def dva_para(karte):
         rezultat = [True, 0, 0]
         for karta in kolikokrat_se_pojavi_katera_stevilka(karte).keys():
             if kolikokrat_se_pojavi_katera_stevilka(karte)[karta] == 2:
-                if rezultat[1] < karta[0]:
+                if rezultat[1] < karta:
                     rezultat[2] = rezultat[1]
-                    rezultat[1] = karta[0]
+                    rezultat[1] = karta
                 else:
-                    rezultat[2] = karta[0]
+                    rezultat[2] = karta
         return rezultat
     return [False]
 
