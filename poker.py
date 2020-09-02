@@ -13,7 +13,9 @@ class Poker:
         self.trenutna_igra = None
         self.ime_igralca = ime_igralca
         self.igralci_v_sobi = [ime_igralca] + random.sample(imena, stevilo_racunalnikov)
-        self.slike_igralcev = {igralec: random.choice(seznam_slik_igralcev) for igralec in self.igralci_v_sobi}
+        slike = seznam_slik_igralcev
+        random.shuffle(slike)
+        self.slike_igralcev = {igralec: slike[i] for i, igralec in enumerate(self.igralci_v_sobi)}
         self.igralci_za_mizo = [igralec for igralec in self.igralci_v_sobi]
         self.big_blind = 10
         self.small_blind = 5
