@@ -28,6 +28,8 @@ oznake_slike = {
     'PIK': 'S'
 }
 
+seznam_slik_igralcev = ['bonomo', 'ivey', 'kenney', 'negreanu', 'nekdo1', 'nekdo2', 'nekdo3', 'nekdo4', 'volpe', 'holz', 'brunson', 'hellmuth', 'chidwick', 'esfandiari']
+
 def alternativni_zapis(karta):
     if karta == 'Neodprta':
         return karta
