@@ -12,7 +12,8 @@ class Poker:
         self.igre = dict()
         self.trenutna_igra = None
         self.ime_igralca = ime_igralca
-        self.igralci_v_sobi = [ime_igralca] + imena[:stevilo_racunalnikov]
+        self.igralci_v_sobi = [ime_igralca] + random.sample(imena, stevilo_racunalnikov)
+        self.slike_igralcev = {igralec: random.choice(seznam_slik_igralcev) for igralec in self.igralci_v_sobi}
         self.igralci_za_mizo = [igralec for igralec in self.igralci_v_sobi]
         self.big_blind = 10
         self.small_blind = 5
