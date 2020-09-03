@@ -12,17 +12,29 @@
         box-sizing: border-box;
       }
 
-      .igralceva_mizica {
-        background-color: slategrey;
-        padding: 15px;
-      }
-
       body {
         font-family: Arial, Helvetica, sans-serif;
       }
 
       .row {
         margin: 0 -5px;
+      }
+
+      .row_poteze {
+        margin: 0 -5px;
+        height: 50px;
+        width: 100%;
+      }
+
+      .row_karte {
+        margin: 0 -5px;
+        height: 250px;
+      }
+
+      .row_poteze:after {
+        content: "";
+        display: table;
+        clear: both;
       }
 
       .row:after {
@@ -37,6 +49,19 @@
           display: block;
           margin-bottom: 20px;
         }
+      }
+
+      .btn {
+        border: none;
+        background-color: inherit;
+        padding: 14px 28px;
+        font-size: 16px;
+        cursor: pointer;
+        display: inline-block;
+      }
+
+      .btn:hover {
+        background: #eee;
       }
 
       .card {
@@ -80,7 +105,7 @@
 
       .slikica-1 {
         border-radius: 8px;
-        box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 2);
+        box-shadow: 0 60px 120px 0 rgb(0, 0, 0);
       }
 
       .slikica-0 {
