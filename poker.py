@@ -101,6 +101,10 @@ class Igra:
         self.denar[igralec] -= self.min_stava() - self.stava[igralec]
         self.stava[igralec] = self.min_stava()
     
+    def all_in(self, igralec):
+        self.stava[igralec] += self.denar[igralec]
+        self.denar[igralec] = 0
+    
     def ime_osebe_na_potezi(self):
         'Vrne ime osebe, ki je trenutno na potezi.'
         return self.igralci[self.na_potezi]
