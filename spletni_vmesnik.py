@@ -84,11 +84,11 @@ def fold_igra(id_sobe):
 
     ime = soba.ime_igralca
 
-    soba.igralec_folda(ime)
+    soba.trenutna_igra.igralec_folda(ime)
 
     soba.trenutna_igra.premakni_potezo()
 
-    soba.preveri_zmaga()
+    soba.trenutna_igra.preveri_zmaga()
 
     if soba.preveri_izid():
         bottle.redirect('/konec_igre/' + str(id_sobe) + '/')
@@ -138,9 +138,9 @@ def racunalnik_igra(id_sobe):
     id_sobe = int(id_sobe)
     soba = slovar_sob[id_sobe]
 
-    oseba_na_potezi = soba.trenutna_igra.igralci[soba.trenutna_igra.na_potezi]
+    oseba_na_potezi = soba.trenutna_igra.ime_osebe_na_potezi()
 
-    izvedi_nakljucno_potezo(soba.trenutna_igra, oseba_na_potezi)
+    izvedi_smiselno_potezo(soba.trenutna_igra, oseba_na_potezi)
 
     soba.trenutna_igra.premakni_potezo()
 
