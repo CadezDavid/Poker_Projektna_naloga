@@ -30,6 +30,20 @@ oznake_slike = {
 
 seznam_slik_igralcev = ['bonomo', 'ivey', 'kenney', 'negreanu', 'nekdo1', 'nekdo2', 'nekdo3', 'nekdo4', 'volpe', 'holz', 'brunson', 'hellmuth', 'chidwick', 'esfandiari', 'selbst', 'liebert', 'boeree', 'ho']
 
+
+imena_kombinacij = {
+    10: 'kraljevo lestvico',
+    9: 'barvno lestvico',
+    8: 'poker',
+    7: 'full house',
+    6: 'barve',
+    5: 'lestvico',
+    4: 'tris',
+    3: 'dva para',
+    2: 'par',
+    1: 'najvišjo karto'
+}
+
 def alternativni_zapis(karta):
     if karta == 'Neodprta':
         return karta
@@ -43,13 +57,23 @@ def nov_kup():
     random.shuffle(kup)
     return kup
 
+def nov_kup_brez(seznam_kart):
+    'Vrne premešan seznam vseh kart, razen tistih, ki so v seznamu kot argument'
+    kup = list()
+    for znak in znaki:
+        for stevilo in stevila:
+            if (stevilo, znak) not in seznam_kart:
+                kup.append((stevilo, znak))
+    random.shuffle(kup)
+    return kup
+
 
 #PRIMERJANJE DVEH SEDMERIC
 
 def na_dva_dela(karte):
     'Razdeli peterico na seznam števil in seznam znakov.'
-    znaki_trenutni = list()
     stevila_trenutna = list()
+    znaki_trenutni = list()
     for karta in karte:
         stevila_trenutna.append(karta[0])
         znaki_trenutni.append(karta[1])
@@ -181,3 +205,15 @@ def equal_sez(seznam):
 
 def seznam_začenši_z_n_tim(seznam, n):
     return seznam[n:] + seznam[:n]
+
+def preciscene_karte(karte):
+    return [karta for karta in karte if karta != 'Neodprta']
+
+def nakljucna_karta():
+    return (random.choice(stevila), random.choice(znaki))
+
+def nakljucna_karta_not_in_karte(karte):
+    karta = (random.choice(stevila), random.choice(znaki))
+    while karta in karte:
+        karta = (random.choice(stevila), random.choice(znaki))
+    return karta
