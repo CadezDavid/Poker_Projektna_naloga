@@ -31,7 +31,7 @@ oznake_slike = {
 seznam_slik_igralcev = ['bonomo', 'ivey', 'kenney', 'negreanu', 'nekdo1', 'nekdo2', 'nekdo3', 'nekdo4', 'volpe', 'holz', 'brunson', 'hellmuth', 'chidwick', 'esfandiari', 'selbst', 'liebert', 'boeree', 'ho']
 
 
-imena_kombinacij = {
+slovar_zmagovalnih_kart = {
     10: 'kraljevo lestvico',
     9: 'barvno lestvico',
     8: 'poker',
@@ -97,35 +97,36 @@ def tvorijo_kraljevo_lestvico(karte):
     return tvorijo_barvo(karte) and all([stevilo in na_dva_dela(karte)[0] for stevilo in range(10, 15)])
 
 def tvorijo_barvo(karte):
-    return len(set(na_dva_dela(karte)[1])) == 1
+    return enaki_v_sez(na_dva_dela(karte)[1])
 
 def poker(karte):
     for stevilka in na_dva_dela(karte)[0]:
         if kolikokrat_se_pojavi_katera_stevilka(karte)[stevilka] == 4:
-            return [True, stevilka]
-    return [False]
+            return [6, stevilka, 0]
+    return False
 
 def full_house(karte):
     if set(kolikokrat_se_pojavi_katera_stevilka(karte).values()) == {2, 3}:
-        rezultat = [True, 0, 0]
+        rezultat = [5, 0, 0]
         for stevilka in kolikokrat_se_pojavi_katera_stevilka(karte).keys():
             if kolikokrat_se_pojavi_katera_stevilka(karte)[stevilka] == 3:
                 rezultat[1] = stevilka
             else:
                 rezultat[2] = stevilka
         return rezultat
-    return [False]
+    return False
 
 def tris(karte):
     if set(kolikokrat_se_pojavi_katera_stevilka(karte).values()) == {3, 1, 1}:
         for karta in kolikokrat_se_pojavi_katera_stevilka(karte).keys():
             if kolikokrat_se_pojavi_katera_stevilka(karte)[karta] == 3:
-                return [True, karta]
-    return [False]
+                return [4, karta, 0]
+    return False
 
 def dva_para(karte):
-    if set(kolikokrat_se_pojavi_katera_stevilka(karte).values()) == {2, 2, 1}:
-        rezultat = [True, 0, 0]
+    #Če predpostavimo, da karte ne tvorijo trisa.
+    if len(set(na_dva_dela(karte)[0])) == 3:
+        rezultat = [3, 0, 0]
         for karta in kolikokrat_se_pojavi_katera_stevilka(karte).keys():
             if kolikokrat_se_pojavi_katera_stevilka(karte)[karta] == 2:
                 if rezultat[1] < karta:
@@ -134,41 +135,41 @@ def dva_para(karte):
                 else:
                     rezultat[2] = karta
         return rezultat
-    return [False]
+    return False
 
 def par(karte):
     if set(kolikokrat_se_pojavi_katera_stevilka(karte).values()) == {2, 1, 1, 1}:
         for karta in kolikokrat_se_pojavi_katera_stevilka(karte).keys():
             if kolikokrat_se_pojavi_katera_stevilka(karte)[karta] == 2:
-                return [True, karta[0]]
-    return [False]
+                return [2, karta, 0]
+    return False
 
 def vrednost(karte):
     'Peterici priredimo seznam dolžine 3.'
     if tvorijo_kraljevo_lestvico(karte):
         return [10, 0, 0]
     elif tvorijo_lestvico(karte) and tvorijo_barvo(karte):
-        return [9, max(karte, key=lambda x: x[0]), 0]
-    elif poker(karte)[0]:
-        return [8, poker(karte)[1], 0]
-    elif full_house(karte)[0]:
+        return [9, max(na_dva_dela(karte)[0]), 0]
+    elif poker(karte):
+        return poker(karte)
+    elif full_house(karte):
         return [7, full_house(karte)[1], full_house(karte)[2]]
     elif tvorijo_barvo(karte):
         return [6, 0, 0]
     elif tvorijo_lestvico(karte):
         return [5, max(karte, key=lambda x: x[0]), 0]
-    elif tris(karte)[0]:
-        return [4, tris(karte), 0]
-    elif dva_para(karte)[0]:
-        return [3, dva_para(karte)[1], dva_para(karte)[2]]
-    elif par(karte)[0]:
-        return [2, par(karte)[1], 0]
+    elif tris(karte):
+        return tris(karte)
+    elif dva_para(karte):
+        return dva_para(karte)
+    elif par(karte):
+        return par(karte)
     else:
         return [1, max(karte, key=lambda x: x[0]), 0]
 
 def najvisjih_pet(karte):
     'Vrne najvišjih pet iz sedmerice.'
-    return sorted(karte, key=lambda x: x[0])[0:5]
+    return sorted(na_dva_dela(karte)[0])[0:5]
 
 def visja_karta(peterica1, peterica2):
     'Izbere peterico, ki zmaga z višjo karto.'
@@ -200,7 +201,7 @@ def primerjaj_sedmerici(karte1, karte2):
     else:
         return 0
 
-def equal_sez(seznam):
+def enaki_v_sez(seznam):
     return seznam[1:] == seznam[:-1]
 
 def seznam_začenši_z_n_tim(seznam, n):
