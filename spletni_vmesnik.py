@@ -36,15 +36,15 @@ def nova_igra(id_sobe):
 
     if soba.trenutna_igra:
         soba.nova_igra(soba.trenutna_igra.denar)
+    else:
+        soba.prva_igra()
 
-    if soba.preveri_izid():
-        bottle.redirect('/konec_igre/' + str(id_sobe) + '/')
+    if soba.preveri_izid()[0]:
+        bottle.redirect('/konec_sobe/' + str(id_sobe) + '/')
 
-    soba.trenutna_igra = Igra(soba.igralci_za_mizo, soba.denar)
-    print(soba.trenutna_igra.kup)
-    print(soba.trenutna_igra.igralci)
     soba.trenutna_igra.razdeli_karte()
-    soba.izvedi_nujne_stave()
+    soba.trenutna_igra.izvedi_nujne_stave()
+    
     return bottle.template('igra.tpl', soba=soba, id_sobe=id_sobe)
 
 @bottle.get('/igra/<id_sobe>/')
@@ -62,14 +62,12 @@ def stava_igra(id_sobe):
     stava = int(bottle.request.forms.getunicode('Stava'))
     ime = soba.ime_igralca
 
-    assert soba.trenutna_igra.denar[ime] >= stava
-
     soba.trenutna_igra.igralec_visa_za(ime, stava)
 
     soba.trenutna_igra.premakni_potezo()
 
-    if soba.preveri_izid():
-        bottle.redirect('/konec_igre/' + str(id_sobe) + '/')
+    if soba.preveri_izid()[0]:
+        bottle.redirect('/konec_sobe/' + str(id_sobe) + '/')
 
     if soba.trenutna_igra.igralci[soba.trenutna_igra.na_potezi] == soba.ime_igralca:
         bottle.redirect('/igra/' + str(id_sobe) + '/')
@@ -77,8 +75,8 @@ def stava_igra(id_sobe):
         bottle.redirect('/igra/racunalnikovi_manevri/' + str(id_sobe) + '/')
     
 
-@bottle.post('/igra/fold/<id_sobe>/')
-def fold_igra(id_sobe):
+@bottle.post('/igra/odstop/<id_sobe>/')
+def odstop_igra(id_sobe):
     id_sobe = int(id_sobe)
     soba = slovar_sob[id_sobe]
 
@@ -88,17 +86,15 @@ def fold_igra(id_sobe):
 
     soba.trenutna_igra.premakni_potezo()
 
-    soba.trenutna_igra.preveri_zmaga()
-
-    if soba.preveri_izid():
-        bottle.redirect('/konec_igre/' + str(id_sobe) + '/')
+    if soba.preveri_izid()[0]:
+        bottle.redirect('/konec_sobe/' + str(id_sobe) + '/')
 
     if soba.trenutna_igra.igralci[soba.trenutna_igra.na_potezi] == soba.ime_igralca:
         bottle.redirect('/igra/' + str(id_sobe) + '/')
     else:
         bottle.redirect('/igra/racunalnikovi_manevri/' + str(id_sobe) + '/')
 
-@bottle.post('/igra/equal/<id_sobe>/')
+@bottle.post('/igra/izenaci/<id_sobe>/')
 def izenaci_igra(id_sobe):
     id_sobe = int(id_sobe)
     soba = slovar_sob[id_sobe]
@@ -109,24 +105,20 @@ def izenaci_igra(id_sobe):
 
     soba.trenutna_igra.premakni_potezo()
 
-    soba.trenutna_igra.preveri_zmaga()
-
     if soba.trenutna_igra.igralci[soba.trenutna_igra.na_potezi] == soba.ime_igralca:
         bottle.redirect('/igra/' + str(id_sobe) + '/')
     else:
         bottle.redirect('/igra/racunalnikovi_manevri/' + str(id_sobe) + '/')
 
-@bottle.post('/igra/check/<id_sobe>/')
-def check_igra(id_sobe):
+@bottle.post('/igra/naprej/<id_sobe>/')
+def naprej_igra(id_sobe):
     id_sobe = int(id_sobe)
     soba = slovar_sob[id_sobe]
 
     soba.trenutna_igra.premakni_potezo()
 
-    soba.trenutna_igra.preveri_zmaga()
-
-    if soba.preveri_izid():
-        bottle.redirect('/konec_igre/' + str(id_sobe) + '/')
+    if soba.preveri_izid()[0]:
+        bottle.redirect('/konec_sobe/' + str(id_sobe) + '/')
 
     if soba.trenutna_igra.igralci[soba.trenutna_igra.na_potezi] == soba.ime_igralca:
         bottle.redirect('/igra/' + str(id_sobe) + '/')
@@ -143,20 +135,18 @@ def racunalnik_igra(id_sobe):
     izvedi_smiselno_potezo(soba.trenutna_igra, oseba_na_potezi)
 
     soba.trenutna_igra.premakni_potezo()
-
-    soba.trenutna_igra.preveri_zmaga()
     
-    if soba.preveri_izid():
-        bottle.redirect('/konec_igre/' + str(id_sobe) + '/')
+    if soba.preveri_izid()[0]:
+        bottle.redirect('/konec_sobe/' + str(id_sobe) + '/')
 
     bottle.redirect('/igra/' + str(id_sobe) + '/')
 
-@bottle.get('/konec_igre/<id_sobe>/')
+@bottle.get('/konec_sobe/<id_sobe>/')
 def konec_igre(id_sobe):
     id_sobe = int(id_sobe)
     soba = slovar_sob[id_sobe]
-    izid = soba.preveri_izid()
-    return bottle.template('konec_igre.tpl', izid=izid)
+    izid = soba.preveri_izid()[1]
+    return bottle.template('konec_sobe.tpl', izid=izid)
 
 @bottle.get('/Slike/<slika>')
 def slike(slika):
