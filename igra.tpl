@@ -9,9 +9,6 @@
 % if soba.ime_igralca != soba.trenutna_igra.igralci[soba.trenutna_igra.na_potezi % len(soba.trenutna_igra.igralci)] and not soba.trenutna_igra.konec:
 <meta http-equiv="refresh" content="0.2;URL=http://127.0.0.1:8080/igra/racunalnikovi_manevri/{{id_sobe}}/">
 % end
-% if soba.trenutna_igra.konec:
-<meta http-equiv="refresh" content="5;URL=http://127.0.0.1:8080/zacetek_igre/{{id_sobe}}/">
-% end
 <link rel="stylesheet" type="text/css" href="bootstrap.css">
 
 <style>
@@ -54,60 +51,84 @@
 </head>
 
 <body>
-<div style="background-image: url('img_girl.jpg');">
 
     <div class='row'>
-% for igralec in soba.igralci_za_mizo:
-    
-% if igralec == soba.ime_igralca:
-
-% else:
-    <div class="column">
-    <img src="/Slike/{{soba.slike_igralcev[igralec]}}.jpg" width='100' class="slikica-{{int(igralec == soba.trenutna_igra.ime_osebe_na_potezi())}}" alt='Slika igralca' height='100'>
-        <div class="card-body">
-            <h5 class="card-title">{{igralec}}</h5>
-            <p class="card-text">
-                <p>Denar: {{soba.trenutna_igra.denar[igralec]}}</p>
-                <p>Stava: {{soba.trenutna_igra.stava[igralec]}}</p>
-                
-                % if igralec in soba.trenutna_igra.igralci_v_igri:
-                <img src='/Slike/pair-of-cards.png' width='50px'>
-                % end
-        </div>
-    </div>
-
-% end
-% end
-    </div>
-
-    % if igra.konec:
-    <div class='row_poteze' width=100%>
+        
         % for igralec in soba.igralci_za_mizo:
-        <div class='column'>
-            <img src='/Slike/{{funkcije.alternativni_zapis(soba.trenutna_igra.karte_igralcev[igralec][0])}}.png' alt='Slika' width="50">
-            <img src="/Slike/{{funkcije.alternativni_zapis(soba.trenutna_igra.karte_igralcev[igralec][1])}}.png" alt='Slika' width="50">
-        </div>
+            
+        % if igralec != soba.ime_igralca:
+        
+            <div class="column">
+            <img src="/Slike/{{soba.slike_igralcev[igralec]}}.jpg" width='100' class="slikica-{{int(igralec == soba.trenutna_igra.ime_osebe_na_potezi())}}" alt='Slika igralca' height='100'>
+                <div class="card-body">
+                    <h5 class="card-title">{{igralec}}</h5>
+                    <p class="card-text">
+                        <p>Denar: {{soba.trenutna_igra.denar[igralec]}}</p>
+                        <p>Stava: {{soba.trenutna_igra.stava[igralec]}}</p>
+                        
+                        % if igralec == soba.trenutna_igra.igralec_z_big_blind():
+                        <img src='/Slike/big_blind.png' width='50px'>
+                        % end
+
+                        % if igralec == soba.trenutna_igra.igralec_s_small_blind():
+                        <img src='/Slike/small_blind.png' width='50px'>
+                        % end
+
+                        % if igralec in soba.trenutna_igra.igralci_v_igri:
+                        <img src='/Slike/pair-of-cards.png' width='50px'>
+                        % end
+
+                        <p>
+                            % if soba.trenutna_igra.konec:
+                            <img src='/Slike/{{funkcije.alternativni_zapis(soba.trenutna_igra.karte_igralcev[igralec][0])}}.png' alt='Slika' width="50">
+                            <img src="/Slike/{{funkcije.alternativni_zapis(soba.trenutna_igra.karte_igralcev[igralec][1])}}.png" alt='Slika' width="50">
+                            % end
+                        </p>
+                </div>
+            </div>
+        
         % end
+    
+        % end
+    
     </div>
 
-    <h5>Zmagal je {{soba.trenutna_igra.zmagovalec}}. V rokah je imel {{}}</h5>
+    % if soba.trenutna_igra.konec:
+
+    % if len(soba.trenutna_igra.zmagovalec) == 1:
+    <form action='/zacetek_igre/{{id_sobe}}/' method='GET'>
+    <p><h2 style='text-align: center;'>Zmagal je {{soba.trenutna_igra.zmagovalec[0]}}. V rokah je imel {{funkcije.slovar_zmagovalnih_kart[soba.trenutna_igra.zmagovalne_karte[0][0]]}}.
+    <button type='submit' value='Naslednja igra' class='btn'>Naslednja igra</button>
+    </form>
+    </p></h2>
+    % else:
+    <h2>
+    
+    <form action='/zacetek_igre/{{id_sobe}}/' method='GET'>
+        Zmagali so: {{igralec for igralec in soba.trenutna_igra.zmagovalec}}
+        % for i in range(1, len(soba.trenutna_igra.zmagovalec) - 1):
+        {{igralec[i] (funkcije.slovar_zmagovalnih_kart[soba.trenutna_igra.zmagovalne_karte[i][0]])}},
+        % end
+        {{soba.trenutna_igra.zmagovalec[-1] (funkcije.slovar_zmagovalnih_kart[soba.trenutna_igra.zmagovalne_karte[-1][0]])}}.
+        <button type='submit' value='Naslednja igra' class='btn'>Naslednja igra</button>
+    </form>
+
+    </h2>
+
+    % end
+
+
+    <table width=30% style='clear: both;'>
+        <tr>
+            % for karta in soba.trenutna_igra.karte_na_mizi:
+            <th>
+                <img src='/Slike/{{funkcije.alternativni_zapis(karta)}}.png' alt='Slika' width="120">
+            </th>
+            % end
+        </tr>
+    </table>
 
     % else:
-    <div class='row_poteze' width=100%>
-        % for igralec in soba.igralci_za_mizo:
-        <div class='column'>
-            % if igralec == soba.trenutna_igra.igralci[soba.pozicija_big_blind]:
-            <div style='padding-left: 40%;'>
-            <input type='button' class='token_big_blind' value='BIG BLIND'>
-            </div>
-            % elif igralec == soba.trenutna_igra.igralci[soba.pozicija_small_blind]:
-            <div style='padding-left: 40%;'>
-            <input type='button' class='token_small_blind' value='SMALL BLIND'>
-            </div>
-            % end
-        </div>
-        % end
-    </div>
 
     <table width=30% style='clear: both;'>
         <tr>
@@ -128,37 +149,57 @@
 
             <img src='/Slike/{{funkcije.alternativni_zapis(soba.trenutna_igra.karte_igralcev[soba.ime_igralca][0])}}.png' alt='Slika' width="120">
             <img src="/Slike/{{funkcije.alternativni_zapis(soba.trenutna_igra.karte_igralcev[soba.ime_igralca][1])}}.png" alt='Slika' width="120">
-            
-            % if soba.ime_igralca == soba.trenutna_igra.igralci[soba.pozicija_big_blind]:
-            <input type='button' class='token_big_blind' value='BIG BLIND'>
-            % elif soba.ime_igralca == soba.trenutna_igra.igralci[soba.pozicija_small_blind]:
-            <input type='button' class='token_small_blind' value='SMALL BLIND'>
-            % end
 
         </div>
+        
+
+        % if soba.trenutna_igra.ime_osebe_na_potezi() == soba.ime_igralca:
         
         <div class='gumbki'>
 
             <form action='/igra/stava/{{id_sobe}}/' method='POST'>
-                <input type='number' name='Stava' min='0' max='{{soba.trenutna_igra.denar[soba. trenutna_igra.igralci[soba.trenutna_igra.na_potezi]]}}' step='{{soba.small_blind}}'>
-                <button type='submit' class='btn'>Stavi</button>
+                <input type='number' name='Stava' min='0' max='{{soba.trenutna_igra.denar[soba. trenutna_igra.igralci[soba.trenutna_igra.na_potezi]]}}' step='{{soba.small_blind()}}'>
+                <input type='submit' value='Stavi' class='btn'>
             </form>
 
-            <form action='/igra/fold/{{id_sobe}}/' method='POST'>
-                <input type='submit' value='Fold' class='btn'>
+            <form action='/igra/odstop/{{id_sobe}}/' method='POST'>
+                <input type='submit' value='Odstop' class='btn'>
             </form>
 
-            <form action='/igra/equal/{{id_sobe}}/' method='POST'>
-                <input type='submit' value='Equal' class='btn'>
+            <form action='/igra/izenaci/{{id_sobe}}/' method='POST'>
+                <input type='submit' value='Izenači' class='btn'>
             </form>
 
             % if soba.trenutna_igra.stava[soba.ime_igralca] == max([soba.trenutna_igra.stava[igralec] for igralec in soba.trenutna_igra.igralci]):
-                <form action='/igra/check/{{id_sobe}}/' method='POST'>
-                    <input type='submit' value='Check' class='btn'>
+                <form action='/igra/naprej/{{id_sobe}}/' method='POST'>
+                    <input type='submit' value='Naprej' class='btn'>
                 </form>
             % end
 
         </div>
+
+        % else:
+
+        <div class='gumbki'>
+
+            <form action='/igra/stava/{{id_sobe}}/' method='POST'>
+                <input type='number' name='Stava' min='0' max='{{soba.trenutna_igra.denar[soba. trenutna_igra.igralci[soba.trenutna_igra.na_potezi]]}}' step='{{soba.small_blind()}}' disabled>
+                <input type='submit' value='Stavi' class='btn' disabled>
+            </form>
+
+            <form action='/igra/odstop/{{id_sobe}}/' method='POST'>
+                <input type='submit' value='Odstop' class='btn' disabled>
+            </form>
+
+            <form action='/igra/izenaci/{{id_sobe}}/' method='POST'>
+                <input type='submit' value='Izenači' class='btn' disabled>
+            </form>
+        
+        </div>
+
+        % end
+
+
 
         <div class='column_spodej'>
         <h4>{{soba.ime_igralca}}</h4>
@@ -166,7 +207,7 @@
         <p>Stava: {{soba.trenutna_igra.stava[soba.ime_igralca]}}</p>
         <div style='padding-top: 30px'>
             <form action='/'>
-                <input type='submit' value='Nova igra'>
+                <input type='submit' value='Nova soba' class='btn'>
             </form>
         </div>
 

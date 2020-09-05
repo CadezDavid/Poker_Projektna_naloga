@@ -71,38 +71,6 @@
         background-color: #f1f1f1;
       }
 
-      .token_big_blind {
-        background-color: gold;
-        text-align: center;
-        text-decoration-color:black;
-        display: block;
-        height: 90px;
-        width: 90px;
-        border-radius: 50%;
-        border: none;
-        text-align: center;
-        font-size: 17px;
-        white-space: normal;
-        cursor: pointer;
-        pointer-events: none;
-      }
-      
-      .token_small_blind {
-        background-color:mediumblue;
-        text-align: center;
-        display: block;
-        color: white;
-        height: 90px;
-        width: 90px;
-        border-radius: 50%;
-        border: none;
-        text-align: center;
-        font-size: 17px;
-        white-space: normal;
-        cursor: pointer;
-        pointer-events: none;
-      }
-
       .slikica-1 {
         border-radius: 8px;
         box-shadow: 0 60px 120px 0 rgb(0, 0, 0);
@@ -127,6 +95,34 @@
         width: 100%;
         opacity: 40%;
         background-color: slategrey;
+      }
+
+      .circle_big_blind {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        text-align: center;
+        padding-top: 7px;
+        font-size: 7px;
+        color: #fff;
+        background: crimson;
+        white-space: normal;
+        cursor: pointer;
+        pointer-events: none;
+      }
+
+      .circle_small_blind {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        text-align: center;
+        padding-top: 7px;
+        font-size: 7px;
+        color: #fff;
+        background: rgb(0, 12, 179);
+        white-space: normal;
+        cursor: pointer;
+        pointer-events: none;
       }
 
     </style>
