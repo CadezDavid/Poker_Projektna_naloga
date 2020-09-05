@@ -32,7 +32,7 @@ def izvedi_smiselno_potezo(igra, igralec):
     karte_na_mizi = funkcije.preciscene_karte(igra.karte_igralcev[igralec])
     
     if igra.odsek == 0:
-        verjetnost = 2 ** (- 1 / (5 * verjetnost_zmage_prvi_odsek(igra.karte_igralcev[igralec]) ** 2)) * 5
+        verjetnost = 2 ** (- 1 / (5 * verjetnost_zmage_prvi_odsek(igra.karte_igralcev[igralec]) ** 2 + 0.001)) * 5
         print('verjetnost_zmage_prvi_odsek', verjetnost)
     else:
         verjetnost = verjetnost_zmage(karte_na_mizi, igra.karte_igralcev[igralec])
@@ -41,7 +41,7 @@ def izvedi_smiselno_potezo(igra, igralec):
     if random.random() < verjetnost + 1 or igra.denar[igralec] * 1.5 < igra.stava[igralec]:
         if igra.denar[igralec] < igra.min_stava():
             igra.all_in(igralec)
-        elif random.random() < verjetnost:
+        elif random.random() < verjetnost and random.random() < 0.2:
             denar = igra.denar[igralec]
             delez_ki_ga_bo_stavil = random.choice([0.1] * 16 + [0.15] * 20 + [0.3] * 5)
             stava = denar * delez_ki_ga_bo_stavil
