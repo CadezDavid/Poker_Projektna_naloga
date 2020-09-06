@@ -157,7 +157,7 @@ def vrednost(karte):
     elif tvorijo_barvo(karte):
         return [6, 0, 0]
     elif tvorijo_lestvico(karte):
-        return [5, max(karte, key=lambda x: x[0]), 0]
+        return [5, max(na_dva_dela(karte)[0]), 0]
     elif tris(karte):
         return tris(karte)
     elif dva_para(karte):
@@ -165,11 +165,11 @@ def vrednost(karte):
     elif par(karte):
         return par(karte)
     else:
-        return [1, max(karte, key=lambda x: x[0]), 0]
+        return [1, 0, 0]
 
 def najvisjih_pet(karte):
     'Vrne najvišjih pet iz sedmerice.'
-    return sorted(na_dva_dela(karte)[0])[0:5]
+    return sorted(na_dva_dela(karte)[0], reverse=True)[0:5]
 
 def visja_karta(peterica1, peterica2):
     'Izbere peterico, ki zmaga z višjo karto.'
