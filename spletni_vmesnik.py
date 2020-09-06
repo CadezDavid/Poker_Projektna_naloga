@@ -69,10 +69,7 @@ def stava_igra(id_sobe):
     if soba.preveri_izid()[0]:
         bottle.redirect('/konec_sobe/' + str(id_sobe) + '/')
 
-    if soba.trenutna_igra.igralci[soba.trenutna_igra.na_potezi] == soba.ime_igralca:
-        bottle.redirect('/igra/' + str(id_sobe) + '/')
-    else:
-        bottle.redirect('/igra/racunalnikovi_manevri/' + str(id_sobe) + '/')
+    bottle.redirect('/igra/' + str(id_sobe) + '/')
     
 
 @bottle.post('/igra/odstop/<id_sobe>/')
@@ -89,10 +86,7 @@ def odstop_igra(id_sobe):
     if soba.preveri_izid()[0]:
         bottle.redirect('/konec_sobe/' + str(id_sobe) + '/')
 
-    if soba.trenutna_igra.igralci[soba.trenutna_igra.na_potezi] == soba.ime_igralca:
-        bottle.redirect('/igra/' + str(id_sobe) + '/')
-    else:
-        bottle.redirect('/igra/racunalnikovi_manevri/' + str(id_sobe) + '/')
+    bottle.redirect('/igra/' + str(id_sobe) + '/')
 
 @bottle.post('/igra/izenaci/<id_sobe>/')
 def izenaci_igra(id_sobe):
@@ -105,10 +99,7 @@ def izenaci_igra(id_sobe):
 
     soba.trenutna_igra.premakni_potezo()
 
-    if soba.trenutna_igra.igralci[soba.trenutna_igra.na_potezi] == soba.ime_igralca:
-        bottle.redirect('/igra/' + str(id_sobe) + '/')
-    else:
-        bottle.redirect('/igra/racunalnikovi_manevri/' + str(id_sobe) + '/')
+    bottle.redirect('/igra/' + str(id_sobe) + '/')
 
 @bottle.post('/igra/naprej/<id_sobe>/')
 def naprej_igra(id_sobe):
@@ -120,10 +111,8 @@ def naprej_igra(id_sobe):
     if soba.preveri_izid()[0]:
         bottle.redirect('/konec_sobe/' + str(id_sobe) + '/')
 
-    if soba.trenutna_igra.igralci[soba.trenutna_igra.na_potezi] == soba.ime_igralca:
-        bottle.redirect('/igra/' + str(id_sobe) + '/')
-    else:
-        bottle.redirect('/igra/racunalnikovi_manevri/' + str(id_sobe) + '/')
+    bottle.redirect('/igra/' + str(id_sobe) + '/')
+
 
 @bottle.get('/igra/racunalnikovi_manevri/<id_sobe>/')
 def racunalnik_igra(id_sobe):
@@ -132,10 +121,17 @@ def racunalnik_igra(id_sobe):
 
     oseba_na_potezi = soba.trenutna_igra.ime_osebe_na_potezi()
 
-    izvedi_smiselno_potezo(soba.trenutna_igra, oseba_na_potezi)
+    drznost = soba.drznost[oseba_na_potezi]
+
+    izvedi_smiselno_potezo(soba.trenutna_igra, oseba_na_potezi, drznost)
 
     soba.trenutna_igra.premakni_potezo()
-    
+
+    print(soba.trenutna_igra.na_potezi)
+    print(soba.trenutna_igra.zaporedni_krog)
+    print(soba.trenutna_igra.odsek)
+    print(soba.trenutna_igra.zadnji_igralec_v_krogu())
+
     if soba.preveri_izid()[0]:
         bottle.redirect('/konec_sobe/' + str(id_sobe) + '/')
 
