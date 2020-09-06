@@ -28,27 +28,30 @@ def verjetnost_zmage_prvi_odsek(karte):
     return stevilo_zmag / (10 * 100)
 
 
-def izvedi_smiselno_potezo(igra, igralec):
+def izvedi_smiselno_potezo(igra, igralec, drznost):
     karte_na_mizi = funkcije.preciscene_karte(igra.karte_igralcev[igralec])
     
     if igra.odsek == 0:
-        verjetnost = 2 ** (- 1 / (5 * verjetnost_zmage_prvi_odsek(igra.karte_igralcev[igralec]) ** 2 + 0.001)) * 5
-        print('verjetnost_zmage_prvi_odsek', verjetnost)
+        verjetnost = verjetnost_zmage_prvi_odsek(igra.karte_igralcev[igralec]) + 0.3
     else:
         verjetnost = verjetnost_zmage(karte_na_mizi, igra.karte_igralcev[igralec])
-        print('verjetnost_zmage', verjetnost)
 
-    if random.random() < verjetnost + 1 or igra.denar[igralec] * 1.5 < igra.stava[igralec]:
-        if igra.denar[igralec] < igra.min_stava():
+    if random.random() < verjetnost + drznost ** 0.2:
+        
+        pogoj1 = int(random.random() < verjetnost)
+        pogoj2 = int(random.random() < drznost)
+        pogoj3 = int(igra.zaporedni_krog == 0)
+        pogoj4 = int(igra.min_stava() > igra.stava[igralec])
+        if igra.denar[igralec] + igra.stava[igralec] < igra.min_stava():
             igra.all_in(igralec)
-        elif random.random() < verjetnost and random.random() < 0.2:
+        elif pogoj1 * pogoj2 * (pogoj3 + pogoj4):
             denar = igra.denar[igralec]
-            delez_ki_ga_bo_stavil = random.choice([0.1] * 16 + [0.15] * 20 + [0.3] * 5)
+            delez_ki_ga_bo_stavil = random.choice([0.02] * 16 + [0.08] * 20 + [0.15] * 5 + [drznost] * 6)
             stava = denar * delez_ki_ga_bo_stavil
             stava = int(stava - stava % 5)
-            print(delez_ki_ga_bo_stavil, stava)
             igra.igralec_visa_za(igralec, max(igra.min_stava(), stava))
         else:
             igra.igralec_izenaci(igralec)
+    
     else:
         igra.igralec_folda(igralec)
