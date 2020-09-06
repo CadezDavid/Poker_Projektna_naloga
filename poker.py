@@ -11,7 +11,10 @@ class Poker:
             imena = [ime.rstrip() for ime in dat.readlines()]
         self.trenutna_igra = None
         self.ime_igralca = ime_igralca
-        self.igralci_v_sobi = [ime_igralca] + random.sample(imena, stevilo_racunalnikov)
+        imena_racunalnikov = random.sample(imena, stevilo_racunalnikov)
+        while ime_igralca in imena_racunalnikov:
+            imena_racunalnikov = random.sample(imena, stevilo_racunalnikov)
+        self.igralci_v_sobi = [ime_igralca] + imena_racunalnikov
         slike = seznam_slik_igralcev
         random.shuffle(slike)
         self.slike_igralcev = {igralec: slike[i] for i, igralec in enumerate(self.igralci_v_sobi)}
@@ -19,6 +22,7 @@ class Poker:
         self.big_blind = 10
         self.pozicija_big_blind = 2 % len(self.igralci_za_mizo)
         self.denar = {igralec: zacetni_denar for igralec in self.igralci_v_sobi}
+        self.drznost = {igralec: random.random()*2/(stevilo_racunalnikov + 1) for igralec in self.igralci_za_mizo}
         self.izid = True
     
     def pozicija_small_blind(self):
@@ -76,8 +80,11 @@ class Igra:
         self.stava = {igralec: 0 for igralec in self.igralci}
         self.konec = False
         self.zmagovalec = None
+        self.zmagovalne_karte = None
         self.pozicija_big_blind = pozicija_big_blind
         self.big_blind = big_blind
+        #Če je več kot 0, se sme višati le, če hkrati izenačiš.
+        self.zaporedni_krog = 0
 
     def small_blind(self):
         return self.big_blind // 2
@@ -91,6 +98,24 @@ class Igra:
     def igralec_s_small_blind(self):
         return self.igralci[self.pozicija_small_blind()]
 
+    def zadnji_igralec_v_krogu(self):
+        indeks = self.pozicija_small_blind()
+        while not self.igralci[indeks] in self.igralci_v_igri:
+            indeks = (indeks - 1) % len(self.igralci)
+        return indeks
+
+    def prvi_igralec_v_krogu(self):
+        indeks = self.pozicija_big_blind
+        while not self.igralci[indeks] in self.igralci_v_igri:
+            indeks = (indeks + 1) % len(self.igralci)
+        return indeks
+    
+    def naslednji_igralec(self):
+        kandidat = (self.na_potezi + 1) % len(self.igralci)
+        while not self.igralci[kandidat] in self.igralci_v_igri:
+            kandidat = (kandidat + 1) % len(self.igralci)
+        return kandidat
+
     def sestej_in_odstrani_stave(self):
         'Sešteje in odstrani vse stave.'
         vsota = 0
@@ -100,19 +125,16 @@ class Igra:
         return vsota
     
     def izvedi_nujne_stave(self):
-        poz_bbl = self.pozicija_big_blind
-        st_igr = len(self.igralci)
-        igralec_z_bbl = self.igralci[poz_bbl]
-        igralec_s_sbl = self.igralci[(poz_bbl - 1) % st_igr]
-        self.igralec_visa_za(igralec_z_bbl, self.big_blind)
-        self.igralec_visa_za(igralec_s_sbl, self.big_blind // 2)
+        self.igralec_visa_za(self.igralec_z_big_blind(), self.big_blind)
+        self.igralec_visa_za(self.igralec_s_small_blind(), self.small_blind())
     
     def min_stava(self):
         return max([self.stava[igralec] for igralec in self.igralci_v_igri])
 
     def igralec_folda(self, igralec):
         'Odstrani igralca iz trenutne igre.'
-        self.igralci_v_igri.remove(igralec)
+        if igralec in self.igralci_v_igri:
+            self.igralci_v_igri.remove(igralec)
     
     def stevilo_igralcev_v_igri(self):
         'Vrne število igralcev v trenutni igri.'
@@ -121,13 +143,19 @@ class Igra:
     def igralec_visa_za(self, igralec, vsota):
         'Igralcu poveča stavo in zmanjša denar.'
         #Igralec poveca svojo stavo na podano vsoto
-        self.denar[igralec] -= vsota
-        self.stava[igralec] += vsota
+        if self.denar[igralec] < vsota:
+            self.all_in(igralec)
+        else:
+            self.denar[igralec] -= vsota
+            self.stava[igralec] += vsota
     
     def igralec_izenaci(self, igralec):
         'Igralcu poveča stavo na najvišjo na mizi.'
-        self.denar[igralec] -= self.min_stava() - self.stava[igralec]
-        self.stava[igralec] = self.min_stava()
+        if self.min_stava() > self.denar[igralec] + self.stava[igralec]:
+            self.all_in(igralec)
+        else:
+            self.denar[igralec] -= self.min_stava() - self.stava[igralec]
+            self.stava[igralec] = self.min_stava()
     
     def all_in(self, igralec):
         self.stava[igralec] += self.denar[igralec]
@@ -141,38 +169,49 @@ class Igra:
         'Premakne potezo na naslednjega igralca v igri. Pri tem mogoče začne nov odsek igre in zato odpre dodatne karte.'
         self.preveri_zmaga()
         if not self.konec:
-            if self.igralci[self.na_potezi] == self.igralec_s_small_blind():
+            if self.na_potezi == self.zadnji_igralec_v_krogu():
                 if self.vse_stave_enake():
                     self.odsek += 1
                     self.odpri_dodatne_karte()
-                    self.na_potezi = self.pozicija_big_blind
+                    self.na_potezi = self.prvi_igralec_v_krogu()
+                    self.zaporedni_krog = 0
                 else:
-                    self.na_potezi = self.pozicija_big_blind
+                    self.zaporedni_krog += 1
+                    self.na_potezi = self.prvi_igralec_v_krogu()
+            elif self.zaporedni_krog > 0 and self.vse_stave_enake() and self.odsek < 3:
+                self.odsek += 1
+                self.odpri_dodatne_karte()
+                self.na_potezi = self.prvi_igralec_v_krogu()
+                self.zaporedni_krog = 0
+            elif self.zaporedni_krog > 0 and self.vse_stave_enake() and self.odsek == 3:
+                self.preveri_zmaga()
             else:
-                self.na_potezi += 1
-                self.na_potezi = self.na_potezi % len(self.igralci)
-                while self.igralci[self.na_potezi] not in self.igralci_v_igri:
-                    self.na_potezi += 1
-                    self.na_potezi = self.na_potezi % len(self.igralci)
+                self.na_potezi = self.naslednji_igralec()
     
     def preveri_zmaga(self):
         'Preveri, ali je mogoče v igri samo en igralec ali pa je konec igre.'
         if self.stevilo_igralcev_v_igri() == 1:
-            kandidat = 0
-            while self.igralci[kandidat] not in self.igralci_v_igri:
-                kandidat += 1
             self.konec = True
-            self.zmagovalec = self.igralci[kandidat]
-            self.denar[self.zmagovalec] += self.sestej_in_odstrani_stave()
-        elif self.odsek == 3 and self.vse_stave_enake() and self.igralci[self.na_potezi] == self.igralec_s_small_blind():
+            self.zmagovalec = [self.igralci_v_igri[0]]
+            self.zmagovalne_karte = [vrednost_sedmerice(self.karte_igralcev[self.zmagovalec[0]] + preciscene_karte(self.karte_na_mizi))]
+            self.denar[self.zmagovalec[0]] += self.sestej_in_odstrani_stave()
+            self.zaporedni_krog = 0
+        elif self.odsek == 3 and self.vse_stave_enake() and self.na_potezi == self.zadnji_igralec_v_krogu():
             self.konec = True
             self.zmagovalec, self.zmagovalne_karte = self.poisci_zmagovalca()
             if len(self.zmagovalec) == 1:
                 self.denar[self.zmagovalec[0]] += self.sestej_in_odstrani_stave()
+                self.zaporedni_krog = 0
             else:
                 stave = self.sestej_in_odstrani_stave()
                 for igralec in self.zmagovalec:
                     self.denar[igralec] += stave // len(self.zmagovalec)
+                self.zaporedni_krog = 0
+        elif all([self.denar[igralec] == 0 for igralec in self.igralci_v_igri]):
+            self.odpri_vse_karte()
+            self.odsek == 3
+            self.na_potezi = self.zadnji_igralec_v_krogu()
+            self.preveri_zmaga()
 
     def poisci_zmagovalca(self):
         karte_na_mizi = self.karte_na_mizi
@@ -206,10 +245,13 @@ class Igra:
             self.turn()
         elif self.odsek == 3:
             self.river()
+    
+    def odpri_vse_karte(self):
+        self.odpri_dodatne_karte()
+        while 'Neodprta' in self.karte_na_mizi:
+            self.odsek += 1
+            self.odpri_dodatne_karte()
 
     def vse_stave_enake(self):
-        stave = [self.stava[igralec] for igralec in self.igralci_v_igri]
+        stave = [self.stava[igralec] for igralec in self.igralci_v_igri if self.denar[igralec] > 0]
         return enaki_v_sez(stave)
-    
-    def zadnji_v_krogu(self):
-        'Preveri, če je na poziciji zadnji v nekem krogu.'
