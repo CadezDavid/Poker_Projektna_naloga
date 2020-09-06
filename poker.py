@@ -184,6 +184,7 @@ class Igra:
                 self.na_potezi = self.prvi_igralec_v_krogu()
                 self.zaporedni_krog = 0
             elif self.zaporedni_krog > 0 and self.vse_stave_enake() and self.odsek == 3:
+                self.na_potezi = self.zadnji_igralec_v_krogu()
                 self.preveri_zmaga()
             else:
                 self.na_potezi = self.naslednji_igralec()
@@ -216,14 +217,14 @@ class Igra:
     def poisci_zmagovalca(self):
         karte_na_mizi = self.karte_na_mizi
         karte = {
-            igralec: (karte_na_mizi + self.karte_igralcev[igralec]) for igralec in self.igralci_v_igri
+            igralec: karte_na_mizi + self.karte_igralcev[igralec] for igralec in self.igralci_v_igri
         }
+        print(karte)
         seznam_najboljsih = list()
         for igralec in self.igralci_v_igri:
             if all([primerjaj_sedmerici(karte[igralec], karte[drug]) != 2 for drug in self.igralci_v_igri]):
                 seznam_najboljsih.append(igralec)
         return seznam_najboljsih, [vrednost_sedmerice(karte[igralec]) for igralec in seznam_najboljsih]
-
 
     def razdeli_karte(self):
         for igralec in self.igralci:

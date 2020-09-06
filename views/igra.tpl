@@ -112,10 +112,10 @@
     
     <form action='/zacetek_igre/{{id_sobe}}/' method='GET'>
         Zmagali so:
-        % for i in range(1, len(soba.trenutna_igra.zmagovalec) - 1):
-        {{igralec[i] (funkcije.slovar_zmagovalnih_kart[soba.trenutna_igra.zmagovalne_karte[i][0]])}},
+        % for i in range(len(soba.trenutna_igra.zmagovalec) - 1):
+        {{soba.trenutna_igra.zmagovalec[i]}} ({{funkcije.slovar_zmagovalnih_kart[soba.trenutna_igra.zmagovalne_karte[i][0]]}}),
         % end
-        {{soba.trenutna_igra.zmagovalec[-1] (funkcije.slovar_zmagovalnih_kart[soba.trenutna_igra.zmagovalne_karte[-1][0]])}}.
+        {{soba.trenutna_igra.zmagovalec[-1]}} ({{funkcije.slovar_zmagovalnih_kart[soba.trenutna_igra.zmagovalne_karte[-1][0]]}}).
         <button type='submit' class='btn_naslednja'>Naslednja igra</button>
     </form>
 
@@ -228,9 +228,9 @@
             <span class="besedilo">
                 Pojasnila vmesnika:
                 <p>Vaša armatura se obarva temneje, ko ste na vrsti.
-                <p>Na zacetku je pred vsakim igralcem slika dveh majhnih kart. Ko ta slika izgine, je igralec odstopil od trenutne igre.
+                <p>Na začetku je pred vsakim igralcem slika dveh majhnih kart. Ko ta slika izgine, je igralec odstopil od trenutne igre.
                 <p>Vsaka stava v igri mora biti večkratnik small blinda.
-                <p>Staviš lahko najmanj toliko, kolikor je vsota največje stave na mizi in small blinda.
+                <p>Staviti morate vsaj toliko, kolikor je vsota največje stave na mizi in small blinda.
             </span>
         </div>
         <div style='padding-top: 30px'>
